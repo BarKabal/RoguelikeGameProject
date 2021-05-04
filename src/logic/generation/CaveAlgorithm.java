@@ -7,8 +7,9 @@ public class CaveAlgorithm {
     int xSize = 30;
     int ySize = 60;
     double chance = 0.45;
-    static long seed = 20; //błędne seedy: 1,2,7,9,16,17(zły tunel),18       poprawne seedy: 5,10,11
+    static long seed = 11;
     int iterations = 5;
+    boolean changes = true;
 
     public CaveAlgorithm(long seed){
         rng = new Random(seed);
@@ -22,9 +23,12 @@ public class CaveAlgorithm {
             cave = reiterate(cave, lastIter);
         }
         cave = findFill(cave, 0, 2);
-        cave = findCavern(cave);
-        //cave = findFill(cave, 2, 0);
-        //cave = findFill(cave, 0, 2);
+        while (changes) {
+            changes = false;
+            cave = findCavern(cave);
+            cave = findFill(cave, 2, 0);
+            cave = findFill(cave, 0, 2);
+        }
 
         return cave;
     }
@@ -144,7 +148,7 @@ public class CaveAlgorithm {
                 tunnelCoordinates[0] = i;
                 tunnelCoordinates[1] = res[0];
                 tunnelCoordinates[2] = res[1];
-                minTunnelLength = tunnelCoordinates[2] - tunnelCoordinates[1];
+                minTunnelLength = Math.abs(tunnelCoordinates[2] - tunnelCoordinates[1]);
             }
         }
         for (int i = minPosY; i <= maxPosY; i++) {
@@ -153,7 +157,7 @@ public class CaveAlgorithm {
                 tunnelCoordinates[0] = i;
                 tunnelCoordinates[1] = res[0];
                 tunnelCoordinates[2] = res[1];
-                minTunnelLength = tunnelCoordinates[2] - tunnelCoordinates[1];
+                minTunnelLength = Math.abs(tunnelCoordinates[2] - tunnelCoordinates[1]);
                 horizontalTunnel = true;
             }
         }
@@ -193,14 +197,14 @@ public class CaveAlgorithm {
             }
         }
         if (leftTunnelStart == 0 && rightTunnelEnd == 0) {
-            return new int[] {0, 0};
+            return new int[] {xSize+ySize, 0};
         } else if (leftTunnelStart == 0) {
             return new int[] {rightTunnelStart, rightTunnelEnd};
         } else if (rightTunnelEnd == 0) {
             return new int[] {leftTunnelStart, leftTunnelEnd};
         } else {
-            if (leftTunnelEnd - leftTunnelStart > rightTunnelEnd - rightTunnelStart) {
-                return new int[] {rightTunnelEnd, rightTunnelStart};
+            if (leftTunnelStart - leftTunnelEnd > rightTunnelStart - rightTunnelEnd) {
+                return new int[] {rightTunnelStart, rightTunnelEnd};
             } else {
                 return new int[] {leftTunnelStart, leftTunnelEnd};
             }
@@ -235,14 +239,14 @@ public class CaveAlgorithm {
             }
         }
         if (upperTunnelStart == 0 && lowerTunnelEnd == 0) {
-            return new int[] {0, 0};
+            return new int[] {xSize+ySize, 0};
         } else if (upperTunnelStart == 0) {
-            return new int[] {lowerTunnelStart, lowerTunnelEnd};
-        } else if (lowerTunnelEnd == 0) {
             return new int[] {upperTunnelStart, upperTunnelEnd};
+        } else if (lowerTunnelEnd == 0) {
+            return new int[] {lowerTunnelStart, lowerTunnelEnd};
         } else {
             if (upperTunnelEnd - upperTunnelStart > lowerTunnelEnd - lowerTunnelStart) {
-                return new int[] {lowerTunnelEnd, lowerTunnelStart};
+                return new int[] {lowerTunnelStart, lowerTunnelEnd};
             } else {
                 return new int[] {upperTunnelStart, upperTunnelEnd};
             }
@@ -252,6 +256,7 @@ public class CaveAlgorithm {
     public int[][] createHorizontalTunnel(int[][] cave, int[] tunnelCoordinates) {
         for (int i = tunnelCoordinates[1] + 1; i < tunnelCoordinates[2]; i++) {
             cave[tunnelCoordinates[0]][i] = 3;
+            changes = true;
         }
         return cave;
     }
@@ -259,6 +264,7 @@ public class CaveAlgorithm {
     public int[][] createVerticalTunnel(int[][] cave, int[] tunnelCoordinates) {
         for (int i = tunnelCoordinates[1] + 1; i < tunnelCoordinates[2]; i++) {
             cave[i][tunnelCoordinates[0]] = 3;
+            changes = true;
         }
         return cave;
     }
