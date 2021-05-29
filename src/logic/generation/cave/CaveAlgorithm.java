@@ -1,13 +1,13 @@
-package logic.generation;
+package logic.generation.cave;
 
 import java.util.Random;
 
 public class CaveAlgorithm {
     Random rng;
-    int xSize = 30;
-    int ySize = 60;
+    int xSize = 100;
+    int ySize = 100;
     double chance = 0.45;
-    static long seed = 11;
+    static long seed = 1;
     int iterations = 5;
     boolean changes = true;
 
