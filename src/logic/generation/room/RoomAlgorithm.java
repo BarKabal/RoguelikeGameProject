@@ -59,7 +59,6 @@ public class RoomAlgorithm {
 
     public void spitRooms() {
         int changes = 1;
-        int iterations = 0;
         while (changes > 0) {
             changes = 0;
             for (int i = 0; i < roomNumber; i++) {
@@ -75,11 +74,6 @@ public class RoomAlgorithm {
                     }
                 }
             }
-            System.out.println("###########################################");
-            System.out.println("Changes:" + changes);
-            System.out.println("Iterations:" + iterations);
-            System.out.println("###########################################");
-            iterations++;
         }
     }
 
@@ -137,10 +131,6 @@ public class RoomAlgorithm {
 
         vecX = (vec * sinZ) / divider;
         vecY = (vec * cosZ) / divider;
-        System.out.println("Id1: " + r1.getId());
-        System.out.println("Id2: " + r2.getId());
-        System.out.println("Overlap: " + vec);
-        System.out.println("-------");
 
         if (higherR1) {
             if (rightR1) {

@@ -15,12 +15,12 @@ public class WindowTest extends Canvas {
     public void paint(Graphics g) {
         setForeground(Color.RED);
         for (int i = 0; i < rooms.size(); i++) {
-            g.drawRect((int) Math.floor(rooms.get(i).xPos - rooms.get(i).width / 2), (int) Math.floor(rooms.get(i).yPos - rooms.get(i).height / 2), (int) Math.floor(rooms.get(i).width), (int) Math.floor(rooms.get(i).height));
+            g.drawRect((int) (rooms.get(i).xPos - rooms.get(i).width / 2), (int) (rooms.get(i).yPos - rooms.get(i).height / 2), (int) (rooms.get(i).width), (int) (rooms.get(i).height));
         }
     }
 
     public static void main(String[] args) {
-        RoomAlgorithm alg = new RoomAlgorithm(2);
+        RoomAlgorithm alg = new RoomAlgorithm(0);
         WindowTest ts = new WindowTest(alg);
         alg.generateRoom();
         JFrame f = new JFrame();
