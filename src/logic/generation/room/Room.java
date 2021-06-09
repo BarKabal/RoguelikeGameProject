@@ -1,7 +1,7 @@
 package logic.generation.room;
 
 public class Room {
-    public static int number = 1;
+    public static int number = 0;
     public int id;
     public double height, width, xPos, yPos, size;
     public Vector vector;
@@ -12,7 +12,7 @@ public class Room {
         this.width = width;
         this.xPos = xPos;
         this.yPos = yPos;
-        this.size = xPos*yPos;
+        this.size = Math.abs(xPos*yPos);
         this.vector = new Vector(0,0);
         number++;
     }
@@ -71,6 +71,8 @@ public class Room {
         lower2 = room2.getyPos() - room2.getHeight()/2;
         left2 = room2.getxPos() - room2.getWidth()/2;
         right2 = room2.getxPos() + room2.getWidth()/2;
+        if (this.id == 10 && room2.id == 44 || this.id == 44 && room2.id == 10)
+            System.out.println("hey");
         if (upper1 > upper2 && lower1 < upper2 || upper1 > lower2 && lower1 < lower2) { //corner of room2 in room1
             if (right1 > right2 && left1 < right2 || right1 > left2 && left1 < left2) {
                 return true;

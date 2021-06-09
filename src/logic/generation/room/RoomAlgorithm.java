@@ -1,30 +1,37 @@
 package logic.generation.room;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class RoomAlgorithm {
-    public double minHeight = 20;
-    public double maxHeight = 100;
-    public double minWidth = 20;
-    public double maxWidth = 100;
+    public double minHeight = 10;
+    public double maxHeight = 50;
+    public double minWidth = 10;
+    public double maxWidth = 50;
     public double clusterCircleRadius = 50;
     public ArrayList<Room> rooms;
-    public ArrayList<Vector> vectors;
-    public int roomNumber = 50;
+    public ArrayList<Room> mainRooms;
+    public ArrayList<Point2D.Double> mainRoomCenters;
+    public ArrayList<Integer[]> graphConnections; //contains connections of rooms in graph [id1,id2]
+    public int roomNumber = 150;
     public Random rng;
-    public long seed;
 
     public RoomAlgorithm(long seed) {
         rng = new Random(seed);
         rooms = new ArrayList<>();
-        vectors = new ArrayList<>();
+        mainRooms = new ArrayList<>();
+        mainRoomCenters = new ArrayList<>();
+        graphConnections = new ArrayList<>();
     }
 
     public void generateRoom() {
         generateRoomCluster();
         spitRooms();
         moveRooms();
+        decideMainRooms();
+        minSpanTree();
+        System.out.println(mainRooms.size());
     }
 
     public void generateRoomCluster() {
@@ -34,7 +41,7 @@ public class RoomAlgorithm {
         }
     }
 
-    public double[] generatePointInCircle() {          //x,y
+    public double[] generatePointInCircle() {
         double t = 2 * Math.PI * rng.nextDouble();
         double u = rng.nextDouble() + rng.nextDouble();
         double r;
@@ -169,8 +176,97 @@ public class RoomAlgorithm {
         }
     }
 
+    public void decideMainRooms() {
+        double meanHeight = 0;
+        double meanWidth = 0;
+        for (int i = 0; i < roomNumber; i++) {
+            meanHeight += rooms.get(i).getHeight();
+            meanWidth += rooms.get(i).getWidth();
+
+        }
+        meanHeight = meanHeight/roomNumber;
+        meanWidth = meanWidth/roomNumber;
+        for (int i = 0; i < roomNumber; i++) {
+            if (rooms.get(i).getWidth() >= meanWidth * 1.25 && rooms.get(i).getHeight() >= meanHeight * 1.25) {
+                mainRooms.add(rooms.get(i));
+            }
+        }
+    }
+
+    public void extractCentres() {
+        for (int i = 0; i < mainRooms.size(); i++) {
+            mainRoomCenters.add(new Point2D.Double(mainRooms.get(i).getxPos(),mainRooms.get(i).getyPos()));
+        }
+    }
+
+    public void minSpanTree() {
+        extractCentres();
+        double[][] distanceMatrix = new double[mainRoomCenters.size()][mainRoomCenters.size()];
+        int[] ids = new int[mainRoomCenters.size()];
+        for (int i = 0 ; i < mainRoomCenters.size(); i++) {
+            ids[i] = mainRooms.get(i).getId();
+            for (int j = 0; j < mainRoomCenters.size(); j++) {
+                if (i != j) {
+                    distanceMatrix[i][j] = distanceFromPoints(mainRoomCenters.get(i).getX(), mainRoomCenters.get(j).getX(), mainRoomCenters.get(i).getY(), mainRoomCenters.get(j).getY());
+                } else {
+                    distanceMatrix[i][j] = 0;
+                }
+            }
+        }
+        ArrayList<Room> roomsInTree = new ArrayList<>();
+        ArrayList<Room> roomsNotInTree = new ArrayList<>(mainRooms);
+        roomsInTree.add(roomsNotInTree.remove(0));
+        while (roomsNotInTree.size() != 0 && roomsInTree.size() != mainRooms.size()) {
+            double minDist = 100000;
+            Room roomIn = null;
+            Room roomOut = null;
+            for (int i = 0; i < ids.length; i++) {
+                if (checkIfRoomIsInList(ids[i], roomsInTree)) {
+                    for (int j = 0; j < ids.length; j++) {
+                        if (checkIfRoomIsInList(ids[j], roomsNotInTree)) {
+                            if (distanceFromPoints(mainRoomCenters.get(i).getX(), mainRoomCenters.get(j).getX(), mainRoomCenters.get(i).getY(), mainRoomCenters.get(j).getY()) < minDist) {
+                                roomIn = mainRooms.get(i);
+                                roomOut = mainRooms.get(j);
+                                minDist = distanceFromPoints(mainRoomCenters.get(i).getX(), mainRoomCenters.get(j).getX(), mainRoomCenters.get(i).getY(), mainRoomCenters.get(j).getY());
+                            }
+                        }
+                    }
+                }
+            }
+            Integer[] connection = new Integer[2];
+            connection[0] = roomIn.getId();
+            connection[1] = roomOut.getId();
+            roomsInTree.add(roomOut);
+            roomsNotInTree.remove(roomOut);
+            graphConnections.add(connection);
+        }
+    }
+
+    public boolean checkIfRoomIsInList(int id, ArrayList<Room> list) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getId() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public ArrayList<Room> getRooms() {
         return rooms;
+    }
+
+    public ArrayList<Room> getMainRooms() {
+        return mainRooms;
+    }
+
+    public ArrayList<Integer[]> getGraphConnections() {
+        return graphConnections;
+    }
+
+    public double distanceFromPoints(double ax, double bx, double ay, double by) {
+        double xd = Math.abs(ax-bx);
+        double yd = Math.abs(ay-by);
+        return Math.sqrt(xd*xd+yd*yd);
     }
 
 }
