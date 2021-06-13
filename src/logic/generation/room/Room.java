@@ -12,8 +12,8 @@ public class Room {
         this.width = width;
         this.xPos = xPos;
         this.yPos = yPos;
-        this.size = Math.abs(xPos*yPos);
-        this.vector = new Vector(0,0);
+        this.size = Math.abs(xPos * yPos);
+        this.vector = new Vector(0, 0);
         number++;
     }
 
@@ -71,8 +71,6 @@ public class Room {
         lower2 = room2.getyPos() - room2.getHeight()/2;
         left2 = room2.getxPos() - room2.getWidth()/2;
         right2 = room2.getxPos() + room2.getWidth()/2;
-        if (this.id == 10 && room2.id == 44 || this.id == 44 && room2.id == 10)
-            System.out.println("hey");
         if (upper1 > upper2 && lower1 < upper2 || upper1 > lower2 && lower1 < lower2) { //corner of room2 in room1
             if (right1 > right2 && left1 < right2 || right1 > left2 && left1 < left2) {
                 return true;
@@ -84,13 +82,43 @@ public class Room {
             }
         }
         if (upper1 > upper2 && upper1 > lower2 && lower1 < upper2 && lower1 < lower2) { //rooms overlap in cross position |1 -2
-            if (right1 > right2 && right1 > left2 && left1 < right2 && left1 < left2) {
+            if (right1 < right2 && right1 > left2 && left1 < right2 && left1 > left2) {
                 return true;
             }
         }
         if (upper2 > upper1 && upper2 > lower1 && lower2 < upper1 && lower2 < lower1) { //rooms overlap in cross position |2 -1
-            if (right2 > right1 && right2 > left1 && left2 < right1 && left2 < left1) {
+            if (right2 < right1 && right2 > left1 && left2 < right1 && left2 > left1) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkIfLineOverlaps(double x1, double y1, double x2, double y2) {
+        double upper1 = this.getyPos() + this.getHeight() / 2;
+        double lower1 = this.getyPos() - this.getHeight() / 2;
+        double left1 = this.getxPos() - this.getWidth() / 2;
+        double right1 = this.getxPos() + this.getWidth() / 2;
+        double lineA = (y2-y1)/(x2-x1);
+        double lineB = y2 - lineA*x2;
+        double xLineUpper = (upper1-lineB)/lineA; //point at which the line intersects the upper point of rectangle
+        double xLineLower = (lower1-lineB)/lineA;
+        double yLineLeft = lineA*left1+lineB;
+        double yLineRight = lineA*right1+lineB;
+        if (y1 < yPos && yPos < y2 || y1 > yPos && yPos > y2) {
+            if (x1 < xPos && xPos < x2 || x1 > xPos && xPos > x2) {
+                if (xLineUpper > left1 && xLineUpper < right1) {
+                    return true;
+                }
+                if (xLineLower > left1 && xLineLower < right1) {
+                    return true;
+                }
+                if (yLineLeft > lower1 && yLineLeft < upper1) {
+                    return true;
+                }
+                if (yLineRight > lower1 && yLineRight < upper1) {
+                    return true;
+                }
             }
         }
         return false;
