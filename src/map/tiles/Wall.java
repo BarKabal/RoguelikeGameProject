@@ -1,11 +1,11 @@
 package map.tiles;
 
-public class wall extends tile {
+public class Wall extends Tile {
 
-    public wall(int givenX, int givenY) {
+    public Wall(int givenX, int givenY) {
         x = givenX;
         y = givenY;
-        asci = '#';
+        asci = "#";
         setWall(true);
         setTransparent(false);
     }

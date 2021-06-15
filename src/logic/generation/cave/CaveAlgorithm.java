@@ -10,30 +10,32 @@ public class CaveAlgorithm {
     static long seed = 1;
     int iterations = 5;
     boolean changes = true;
+    int[][] cave;
 
     public CaveAlgorithm(long seed){
         rng = new Random(seed);
     }
 
     public int[][] generateCave() {
-        int[][] cave = new int[xSize][ySize];
-        cave = generateInitial(cave);
+        cave = new int[xSize][ySize];
+        generateInitial(cave);
         for (int i = 0; i < iterations; i++) {
             boolean lastIter = i == iterations - 1;
-            cave = reiterate(cave, lastIter);
+            reiterate(cave, lastIter);
         }
-        cave = findFill(cave, 0, 2);
+        findFill(cave, 0, 2);
         while (changes) {
             changes = false;
             cave = findCavern(cave);
-            cave = findFill(cave, 2, 0);
-            cave = findFill(cave, 0, 2);
+            findFill(cave, 2, 0);
+            findFill(cave, 0, 2);
         }
+        finishConverting(cave);
 
         return cave;
     }
 
-    public int[][] generateInitial(int[][] cave){
+    private int[][] generateInitial(int[][] cave){
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
                 if (i == 0 || j == 0 || i == xSize - 1 || j == ySize - 1) {
@@ -50,7 +52,7 @@ public class CaveAlgorithm {
         return cave;
     }
 
-    public int[][] reiterate(int[][] cave, boolean lastIter) {
+    private int[][] reiterate(int[][] cave, boolean lastIter) {
         Random check = new Random(seed);
         int[][] neighbour = new int[xSize][ySize];
         for (int i = 1; i < xSize-1; i++) {
@@ -78,26 +80,7 @@ public class CaveAlgorithm {
         return cave;
     }
 
-    public static void main(String[] args) {
-        CaveAlgorithm ca = new CaveAlgorithm(seed);
-        int[][] cave = ca.generateCave();
-        for (int i = 0; i < ca.xSize; i++) {
-            for (int j = 0; j < ca.ySize; j++) {
-                if (cave[i][j] == 1) {
-                    System.out.print("#");
-                } else if (cave[i][j] == 2){
-                    System.out.print(",");
-                } else if (cave[i][j] == 0){
-                    System.out.print(".");
-                } else if (cave[i][j] == 3){
-                    System.out.print("0");
-                }
-            }
-            System.out.print("\n");
-        }
-    }
-
-    public int[][] findFill(int[][] cave, int colorStart, int colorEnd) {
+    private int[][] findFill(int[][] cave, int colorStart, int colorEnd) {
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
                 if (cave[i][j] == colorStart) {
@@ -109,7 +92,7 @@ public class CaveAlgorithm {
         return cave;
     }
 
-    public int[][] findCavern(int[][] cave) {
+    private int[][] findCavern(int[][] cave) {
         boolean foundStart = false;
         int minX = 0, maxX = 0, minY = 0, maxY = 0;
         for (int i = 0; i < xSize; i++) {
@@ -138,7 +121,7 @@ public class CaveAlgorithm {
         return cave;
     }
 
-    public int[][] findTunnelSpot(int[][] cave, int minPosX, int minPosY, int maxPosX, int maxPosY) {
+    private int[][] findTunnelSpot(int[][] cave, int minPosX, int minPosY, int maxPosX, int maxPosY) {
         int minTunnelLength = xSize + ySize;
         int[] tunnelCoordinates = new int[3];   //[rząd/kolumna,początek,koniec]
         boolean horizontalTunnel = false;
@@ -162,14 +145,14 @@ public class CaveAlgorithm {
             }
         }
         if (horizontalTunnel) {
-            cave = createHorizontalTunnel(cave, tunnelCoordinates);
+            createHorizontalTunnel(cave, tunnelCoordinates);
         } else {
-            cave = createVerticalTunnel(cave, tunnelCoordinates);
+            createVerticalTunnel(cave, tunnelCoordinates);
         }
         return cave;
     }
 
-    public int[] scanForHorizontalTunnel(int[] cavePart) {
+    private int[] scanForHorizontalTunnel(int[] cavePart) {
         boolean availableRightTunnel = false;
         boolean availableLeftTunnel = false;
         boolean leftTunnelDone = false;
@@ -211,7 +194,7 @@ public class CaveAlgorithm {
         }
     }
 
-    public int[] scanForVerticalTunnel(int[] cavePart) {
+    private int[] scanForVerticalTunnel(int[] cavePart) {
         boolean availableLowerTunnel = false;
         boolean availableUpperTunnel = false;
         boolean upperTunnelDone = false;
@@ -253,7 +236,7 @@ public class CaveAlgorithm {
         }
     }
 
-    public int[][] createHorizontalTunnel(int[][] cave, int[] tunnelCoordinates) {
+    private int[][] createHorizontalTunnel(int[][] cave, int[] tunnelCoordinates) {
         for (int i = tunnelCoordinates[1] + 1; i < tunnelCoordinates[2]; i++) {
             cave[tunnelCoordinates[0]][i] = 3;
             changes = true;
@@ -261,7 +244,7 @@ public class CaveAlgorithm {
         return cave;
     }
 
-    public int[][] createVerticalTunnel(int[][] cave, int[] tunnelCoordinates) {
+    private int[][] createVerticalTunnel(int[][] cave, int[] tunnelCoordinates) {
         for (int i = tunnelCoordinates[1] + 1; i < tunnelCoordinates[2]; i++) {
             cave[i][tunnelCoordinates[0]] = 3;
             changes = true;
@@ -269,7 +252,7 @@ public class CaveAlgorithm {
         return cave;
     }
 
-    public int[][] floodFill(int[][] cave, int posX, int posY, int colorEnd) {
+    private int[][] floodFill(int[][] cave, int posX, int posY, int colorEnd) {
         if (cave[posX][posY] == 1 || cave[posX][posY] == colorEnd) {
             return cave;
         }
@@ -287,11 +270,29 @@ public class CaveAlgorithm {
         return cave;
     }
 
-    public int[] getColumn(int[][] array, int index) {
+    private int[] getColumn(int[][] array, int index) {
         int[] column = new int[array.length];
         for(int i=0; i<column.length; i++){
             column[i] = array[i][index];
         }
         return column;
+    }
+
+    private void finishConverting(int[][] map) {
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                if (map[i][j] == 2) {
+                    map[i][j] = 0;
+                }
+            }
+        }
+    }
+
+    public int[] returnSize() {
+        return new int[]{cave.length,cave[0].length};
+    }
+
+    public int[][] returnCave() {
+        return cave;
     }
 }

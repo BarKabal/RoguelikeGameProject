@@ -18,12 +18,12 @@ public class RoomAlgorithm {
     public double extraConnectChance = 0.005;
     public int roomNumber = 300; //1000 max inaczej bardzo długa kompilacja
     public Random rng;
-    public long seed = 3;
     public boolean changes = true;
     public int xSize;
     public int ySize;
+    int[][] map;
 
-    public RoomAlgorithm() {
+    public RoomAlgorithm(long seed) {
         rng = new Random(seed);
         rooms = new ArrayList<>();
         mainRooms = new ArrayList<>();
@@ -43,14 +43,14 @@ public class RoomAlgorithm {
         convertToMap();
     }
 
-    public void generateRoomCluster() {
+    private void generateRoomCluster() {
         for (int i = 0; i < roomNumber; i++) {
             double[] tmp = generatePointInCircle();
             rooms.add(constructRoomAroundPoint(tmp[0], tmp[1]));
         }
     }
 
-    public double[] generatePointInCircle() {
+    private double[] generatePointInCircle() {
         double t = 2 * Math.PI * rng.nextDouble();
         double u = rng.nextDouble() + rng.nextDouble();
         double r;
@@ -66,14 +66,14 @@ public class RoomAlgorithm {
         return coordinates;
     }
 
-    public Room constructRoomAroundPoint(double x, double y) {
+    private Room constructRoomAroundPoint(double x, double y) {
         double width, height;
         width = minWidth + (maxWidth - minWidth) * rng.nextDouble();
         height = minHeight + (maxHeight - minHeight) * rng.nextDouble();
         return new Room(height, width, x + width / 2, y + height / 2);
     }
 
-    public void spitRooms() {
+    private void spitRooms() {
         int slitChanges = 1;
         while (slitChanges > 0) {
             slitChanges = 0;
@@ -93,7 +93,7 @@ public class RoomAlgorithm {
         }
     }
 
-    public boolean generateVector(Room r1, Room r2) {
+    private boolean generateVector(Room r1, Room r2) {
         int divider = 2;
         double x1 = r1.getxPos();
         double y1 = r1.getyPos();
@@ -168,7 +168,7 @@ public class RoomAlgorithm {
         return true;
     }
 
-    public void moveRooms() {
+    private void moveRooms() {
         double tmpX = 10000;
         double tmpY = 10000;
         for (int i = 0; i < finalRooms.size(); i++) {
@@ -183,7 +183,7 @@ public class RoomAlgorithm {
         }
     }
 
-    public void decideMainRooms() {
+    private void decideMainRooms() {
         double meanHeight = 0;
         double meanWidth = 0;
         for (int i = 0; i < roomNumber; i++) {
@@ -200,13 +200,13 @@ public class RoomAlgorithm {
         }
     }
 
-    public void extractCentres() {
+    private void extractCentres() {
         for (int i = 0; i < mainRooms.size(); i++) {
             mainRoomCenters.add(new Point2D.Double(mainRooms.get(i).getxPos(), mainRooms.get(i).getyPos()));
         }
     }
 
-    public void minSpanTree() {
+    private void minSpanTree() {
         extractCentres();
         int[] ids = new int[mainRoomCenters.size()];
         for (int i = 0; i < mainRoomCenters.size(); i++) {
@@ -241,7 +241,7 @@ public class RoomAlgorithm {
         }
     }
 
-    public boolean checkIfRoomIsInList(int id, ArrayList<Room> list) {
+    private boolean checkIfRoomIsInList(int id, ArrayList<Room> list) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getId() == id) {
                 return true;
@@ -250,21 +250,13 @@ public class RoomAlgorithm {
         return false;
     }
 
-    public ArrayList<Room> getMainRooms() {
-        return mainRooms;
-    }
-
-    public ArrayList<Integer[]> getGraphConnections() {
-        return graphConnections;
-    }
-
-    public double distanceFromPoints(double ax, double bx, double ay, double by) {
+    private double distanceFromPoints(double ax, double bx, double ay, double by) {
         double xd = Math.abs(ax - bx);
         double yd = Math.abs(ay - by);
         return Math.sqrt(xd * xd + yd * yd);
     }
 
-    public void addExtraConnects() {
+    private void addExtraConnects() {
         for (int i = 0; i < mainRooms.size(); i++) {
             for (int j = 0; j < mainRooms.size(); j++) {
                 for (int k = 0; k < graphConnections.size(); k++) {
@@ -281,7 +273,7 @@ public class RoomAlgorithm {
         }
     }
 
-    public void reduceNotUsedRooms() {
+    private void reduceNotUsedRooms() {
         finalRooms.addAll(mainRooms);
         for (int i = 0; i < graphConnections.size(); i++) {
             for (int j = 0; j < rooms.size(); j++) {
@@ -292,13 +284,9 @@ public class RoomAlgorithm {
         }
     }
 
-    public ArrayList<Room> getFinalRooms() {
-        return finalRooms;
-    }
-
-    public void convertToMap() {
+    private void convertToMap() {
         double[] maxXY = findMaximalXAndY();
-        int[][] map = new int[(int) Math.round(maxXY[1]) + 1][(int) Math.round(maxXY[0]) + 1];
+        map = new int[(int) Math.round(maxXY[1]) + 1][(int) Math.round(maxXY[0]) + 1];
         xSize = map.length;
         ySize = map[0].length;
         for (int i = 0; i < map.length; i++) {
@@ -327,24 +315,20 @@ public class RoomAlgorithm {
         }
     }
 
-    public void printMapToTerminal(int[][] map) {
+    private void printMapToTerminal(int[][] map) {
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[0].length; j++) {
-                if (map[i][j] == 1 || map[i][j] == -2) {
+                if (map[i][j] == 1) {
                     System.out.print("#");
-                } else if (map[i][j] == 2) {
+                } else if (map[i][j] == 0) {
                     System.out.print(".");
-                } else if (map[i][j] == 0 || map[i][j] == -1) {
-                    System.out.print(" ");
-                } else if (map[i][j] == 3 || map[i][j] == 4) {
-                    System.out.print("0");
                 }
             }
             System.out.print("\n");
         }
     }
 
-    public double[] findMaximalXAndY() {
+    private double[] findMaximalXAndY() {
         double[] result = new double[]{0, 0};
         for (int i = 0; i < finalRooms.size(); i++) {
             if (finalRooms.get(i).getxPos() + finalRooms.get(i).getWidth() / 2 > result[0]) {
@@ -357,7 +341,7 @@ public class RoomAlgorithm {
         return result;
     }
 
-    public void createDoorsAndHallways(int[][] map) {
+    private void createDoorsAndHallways(int[][] map) {
         for (int i = 0; i < finalRooms.size(); i++) {
             carveTunnel(scanRight(finalRooms.get(i), map), map);
             carveTunnel(scanDown(finalRooms.get(i), map), map);
@@ -373,7 +357,7 @@ public class RoomAlgorithm {
         }
     }
 
-    public Integer[] scanRight(Room room, int[][] map) {
+    private Integer[] scanRight(Room room, int[][] map) {
         int up = (int) Math.round(room.getyPos() - room.getHeight() / 2);
         int down = (int) Math.round(room.getyPos() + room.getHeight() / 2);
         int right = (int) Math.round(room.getxPos() + room.getWidth() / 2);
@@ -407,7 +391,7 @@ public class RoomAlgorithm {
         }
     }
 
-    public Integer[] scanDown(Room room, int[][] map) {
+    private Integer[] scanDown(Room room, int[][] map) {
         int down = (int) Math.round(room.getyPos() + room.getHeight() / 2);
         int right = (int) Math.round(room.getxPos() + room.getWidth() / 2);
         int left = (int) Math.round(room.getxPos() - room.getWidth() / 2);
@@ -467,7 +451,7 @@ public class RoomAlgorithm {
         return null;
     }
 
-    public int[][] floodFill(int[][] cave, int posX, int posY, int colorEnd) {
+    private int[][] floodFill(int[][] cave, int posX, int posY, int colorEnd) {
         if (cave[posX][posY] == 1 || cave[posX][posY] == colorEnd || cave[posX][posY] == 4) {
             return cave;
         }
@@ -493,12 +477,21 @@ public class RoomAlgorithm {
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[0].length; j++) {
                 switch (map[i][j]) {
-                    case -1: map[i][j] = 0;
-                    case 0: map[i][j] = 1;
-                    case 4: map[i][j] = 0;
-                    case 3: map[i][j] = 0;
+                    case -1:
+                    case 3:
+                    case 4:
+                        map[i][j] = 0; break;
+                    case 0: map[i][j] = 1; break;
                 }
             }
         }
+    }
+
+    public int[] returnSize() {
+        return new int[]{map.length,map[0].length};
+    }
+
+    public int[][] returnMap() {
+        return map;
     }
 }

@@ -1,10 +1,10 @@
 package map.tiles;
 
-public class floor extends tile {
-    public floor(int givenX, int givenY) {
+public class Floor extends Tile {
+    public Floor(int givenX, int givenY) {
         x = givenX;
         y = givenY;
-        asci = '.';
+        asci = ".";
         setWall(false);
         setTransparent(true);
     }

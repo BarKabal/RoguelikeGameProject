@@ -1,9 +1,9 @@
 package map.tiles;
 
-public abstract class tile {
+public class Tile {
     protected int x, y;
     private boolean wall, occupiedMon, occupiedIte, visible, transparent;
-    protected char asci;
+    protected String asci;
 
     public void setWall(boolean wall) {
         this.wall = wall;
@@ -45,7 +45,7 @@ public abstract class tile {
         return transparent;
     }
 
-    public char getAsci() {
+    public String getAsci() {
         return asci;
     }
 }
