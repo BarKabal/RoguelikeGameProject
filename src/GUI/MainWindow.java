@@ -223,6 +223,11 @@ public class MainWindow extends JFrame implements ActionListener, Runnable, KeyL
         addComponent(mainHand, 15, 55, 48, 48, backgroundColor, Color.WHITE, false, equipmentPanel);
         addComponent(offHand, 115, 55, 48, 48, backgroundColor, Color.WHITE, false, equipmentPanel);
         addComponent(boots, 65, 105, 48, 48, backgroundColor, Color.WHITE, false, equipmentPanel);
+        helmet.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        armor.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        mainHand.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        offHand.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        boots.setBorder(new BevelBorder(BevelBorder.LOWERED));
     }
 
     private void addInventory() {
