@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class MonsterQueue {
-    private PriorityQueue<Double> queue;
-    private HashMap<Double, Monster> monsters; //monster is null if players turn
+    private final PriorityQueue<Double> queue;
+    private final HashMap<Double, Monster> monsters; //monster is null if players turn
 
     public MonsterQueue() {
         queue = new PriorityQueue<>();
@@ -35,4 +35,9 @@ public class MonsterQueue {
         queue.remove(monster.getNextMove());
         monsters.remove(monster.getNextMove(), monster);
     }
+
+    public int getLength() {
+        return queue.size();
+    }
+
 }

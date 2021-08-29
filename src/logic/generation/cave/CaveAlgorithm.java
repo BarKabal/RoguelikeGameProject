@@ -18,7 +18,7 @@ public class CaveAlgorithm {
         this.gameData = gameData;
     }
 
-    public int[][] generateCave() {
+    public void generateCave() {
         cave = new int[xSize][ySize];
         generateInitial(cave);
         for (int i = 0; i < iterations; i++) {
@@ -28,16 +28,15 @@ public class CaveAlgorithm {
         findFill(cave, 0, 2);
         while (changes) {
             changes = false;
-            cave = findCavern(cave);
+            findCavern(cave);
             findFill(cave, 2, 0);
             findFill(cave, 0, 2);
         }
         finishConverting(cave);
         printMapToTerminal(cave);
-        return cave;
     }
 
-    private int[][] generateInitial(int[][] cave){
+    private void generateInitial(int[][] cave){
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
                 if (i == 0 || j == 0 || i == xSize - 1 || j == ySize - 1) {
@@ -51,7 +50,6 @@ public class CaveAlgorithm {
                 }
             }
         }
-        return cave;
     }
 
     private void reiterate(int[][] cave, boolean lastIter) {
@@ -81,19 +79,18 @@ public class CaveAlgorithm {
         }
     }
 
-    private int[][] findFill(int[][] cave, int colorStart, int colorEnd) {
+    private void findFill(int[][] cave, int colorStart, int colorEnd) {
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
                 if (cave[i][j] == colorStart) {
                     floodFill(cave, i, j, colorEnd);
-                    return cave;
+                    return;
                 }
             }
         }
-        return cave;
     }
 
-    private int[][] findCavern(int[][] cave) {
+    private void findCavern(int[][] cave) {
         boolean foundStart = false;
         int minX = 0, maxX = 0, minY = 0, maxY = 0;
         for (int i = 0; i < xSize; i++) {
@@ -118,11 +115,10 @@ public class CaveAlgorithm {
                 }
             }
         }
-        cave = findTunnelSpot(cave, minX, minY, maxX, maxY);
-        return cave;
+        findTunnelSpot(cave, minX, minY, maxX, maxY);
     }
 
-    private int[][] findTunnelSpot(int[][] cave, int minPosX, int minPosY, int maxPosX, int maxPosY) {
+    private void findTunnelSpot(int[][] cave, int minPosX, int minPosY, int maxPosX, int maxPosY) {
         int minTunnelLength = xSize + ySize;
         int[] tunnelCoordinates = new int[3];   //[rząd/kolumna,początek,koniec]
         boolean horizontalTunnel = false;
@@ -150,7 +146,6 @@ public class CaveAlgorithm {
         } else {
             createVerticalTunnel(cave, tunnelCoordinates);
         }
-        return cave;
     }
 
     private int[] scanForHorizontalTunnel(int[] cavePart) {
@@ -237,20 +232,18 @@ public class CaveAlgorithm {
         }
     }
 
-    private int[][] createHorizontalTunnel(int[][] cave, int[] tunnelCoordinates) {
+    private void createHorizontalTunnel(int[][] cave, int[] tunnelCoordinates) {
         for (int i = tunnelCoordinates[1] + 1; i < tunnelCoordinates[2]; i++) {
             cave[tunnelCoordinates[0]][i] = 3;
             changes = true;
         }
-        return cave;
     }
 
-    private int[][] createVerticalTunnel(int[][] cave, int[] tunnelCoordinates) {
+    private void createVerticalTunnel(int[][] cave, int[] tunnelCoordinates) {
         for (int i = tunnelCoordinates[1] + 1; i < tunnelCoordinates[2]; i++) {
             cave[i][tunnelCoordinates[0]] = 3;
             changes = true;
         }
-        return cave;
     }
 
     private int[][] floodFill(int[][] cave, int posX, int posY, int colorEnd) {

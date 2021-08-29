@@ -18,8 +18,8 @@ public class POISprinkler {
     Tile[][] tiledMap;
     HashMap<String, Monster> monstersGenerated;
     HashMap<String, item> itemsGenerated;
-    private ArrayList<Tile> stairsDowns;
-    private ArrayList<Tile> stairsUps;
+    private final ArrayList<Tile> stairsDowns;
+    private final ArrayList<Tile> stairsUps;
     DungeonFloor floorData;
     GameData gameData;
     ArrayList<Integer[]> possibleCoordinates; //use .remove(int index) to get the element when adding stairs monsters etc.
@@ -125,10 +125,6 @@ public class POISprinkler {
 
     public int[] getEntry() { //x,y
         return new int[]{entryX, entryY};
-    }
-
-    public DungeonFloor getFloorData() {
-        return floorData;
     }
 
     public HashMap<String, Monster> getMonstersGenerated() {

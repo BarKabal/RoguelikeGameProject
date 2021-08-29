@@ -6,7 +6,7 @@ import java.io.File;
 
 public abstract class Tile {
     protected int x, y, stairID;
-    private boolean wall, occupiedMon, occupiedIte, visible, transparent, seen;
+    private boolean wall, visible, seen;
     protected String asci;
     protected int isStairs; //-1 for down, 0 for not stairs, 1 for up
 
@@ -21,10 +21,7 @@ public abstract class Tile {
     public boolean markAsVisible() {
         seen = true;
         visible = true;
-        if (wall)
-            return true;
-        else
-            return false;
+        return wall;
     }
 
     public BufferedImage getPng() {

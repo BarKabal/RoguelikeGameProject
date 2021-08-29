@@ -9,7 +9,7 @@ public class Skeleton extends Monster {
         currentHealth = maxHealth;
         lvl = 1;
         drop = null;
-        speed = 1.1;
+        speed = 1.123;
         minDmg = 1;
         maxDmg = 3;
     }

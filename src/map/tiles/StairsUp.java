@@ -10,8 +10,4 @@ public class StairsUp extends Tile {
         isStairs = 1;
         this.stairID = stairID;
     }
-
-    public int getStairID() {
-        return stairID;
-    }
 }

@@ -6,7 +6,7 @@ import map.npc.Zombie;
 import map.npc.Monster;
 
 public class MonsterGenerator {
-    private GameData gameData;
+    private final GameData gameData;
 
     public MonsterGenerator(GameData gameData) {
         this.gameData = gameData;

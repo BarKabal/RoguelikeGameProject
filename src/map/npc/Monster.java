@@ -3,7 +3,6 @@ package map.npc;
 import logic.gameData.DungeonFloor;
 import logic.gameData.GameData;
 import map.items.item;
-import map.tiles.Tile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

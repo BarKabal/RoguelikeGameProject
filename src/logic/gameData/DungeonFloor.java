@@ -16,8 +16,9 @@ public class DungeonFloor {
     private ArrayList<Tile> stairsUps;
     private POISprinkler POISprinkler;
     private int entranceX, entranceY;
-    private int floorNumber;
+    private final int floorNumber;
     private MonsterQueue monsterQueue;
+    private boolean lastPlayerMove;
 
     public DungeonFloor(GameData gameData, int floorNumber) {
         this.floorNumber = floorNumber;
@@ -104,9 +105,15 @@ public class DungeonFloor {
             gameData.setTime(monsterQueue.peekNextTime());
             Monster nextMonster = monsterQueue.getNextMonsterTurn();
             if (nextMonster == null) {
-                nextPlayerRound = true;
-                monsterQueue.addMonster(null, gameData.getCharacterData().getActionTime() + gameData.getTime());
+                if (lastPlayerMove && monsterQueue.getLength() > 1) {
+                    nextPlayerRound = true;
+                } else {
+                    nextPlayerRound = true;
+                    monsterQueue.addMonster(null, gameData.getCharacterData().getActionTime() + gameData.getTime());
+                    lastPlayerMove = true;
+                }
             } else {
+                lastPlayerMove = false;
                 initialKey = nextMonster.getX() + "," + nextMonster.getY();
                 monsterQueue.addMonster(nextMonster, nextMonster.makeNextMove(gameData.getCharacterData().getPositionX(), gameData.getCharacterData().getPositionY(), gameData));
                 monsters.remove(initialKey, nextMonster);

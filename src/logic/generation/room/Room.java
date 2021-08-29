@@ -2,8 +2,12 @@ package logic.generation.room;
 
 public class Room {
     private static int number = 0;
-    private int id;
-    private double height, width, xPos, yPos, size;
+    private final int id;
+    private final double height;
+    private final double width;
+    private double xPos;
+    private double yPos;
+    private final double size;
     private Vector vector;
 
     public Room(double height, double width, double xPos, double yPos) {

@@ -3,13 +3,13 @@ package logic.gameData;
 import java.util.ArrayList;
 
 public class MapData { //przechowuje wszystkie dane mapy, ustawienie potworów, przedmiotów, gracza
-    private ArrayList<DungeonFloor> dungeonFloors;
-    private final int dungeonLength = 10;
+    private final ArrayList<DungeonFloor> dungeonFloors;
     GameData gameData;
 
     public MapData(GameData gameData) {
         this.gameData = gameData;
         dungeonFloors = new ArrayList<>();
+        int dungeonLength = 10;
         for (int i = 0; i < dungeonLength; i++) {
             System.out.print(i + "\n");
             dungeonFloors.add(new DungeonFloor(gameData, i));

@@ -8,5 +8,4 @@ public class Wall extends Tile {
         asci = "#";
         setWall(true);
     }
-
 }

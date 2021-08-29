@@ -20,7 +20,8 @@ import java.util.Random;
 
 public class MainWindow extends JFrame implements ActionListener, Runnable, KeyListener, MouseListener {
 
-    private JPanel menuPanel, gamePanel, equipmentPanel;
+    private JPanel menuPanel, gamePanel, equipmentPanel, gameOver;
+    private JLabel gameOverLabel;
     private final Color backgroundColor = new Color(15, 15, 40, 255);
     private long seed;
     private int type;
@@ -165,6 +166,29 @@ public class MainWindow extends JFrame implements ActionListener, Runnable, KeyL
         this.add(equipmentPanel);
         gamePanel.setVisible(true);
         equipmentPanel.setVisible(true);
+    }
+
+    private void gameOver() {
+        gameActive = false;
+        gameOver = new JPanel();
+        gameOver.setBackground(Color.BLACK);
+        gameOver.setPreferredSize(new Dimension(1475, 765));
+        gameOver.setBounds(0, 0, 1475, 765);
+        gameOver.setLayout(null);
+
+        gameOverLabel = new JLabel("GAME OVER");
+        gameOverLabel.setBounds(600,300,275,165);
+        gameOverLabel.setBackground(Color.BLACK);
+        gameOverLabel.setForeground(Color.WHITE);
+        gameOverLabel.setEnabled(false);
+        gameOver.add(gameOverLabel);
+        gameOver.setVisible(true);
+
+        this.remove(gamePanel);
+        this.remove(equipmentPanel);
+        this.add(gameOver);
+        gameOver.setVisible(true);
+        repaint();
     }
 
     private void addGameLabels() {
@@ -353,8 +377,9 @@ public class MainWindow extends JFrame implements ActionListener, Runnable, KeyL
         if (!gameActive) {
             switch (command) {
                 case "New Game": newGameChoice(); break;
-                case "Continue": break;
-                case "Settings": break;
+                case "Continue":
+                case "Settings":
+                    break;
             }
         }
     }
@@ -362,6 +387,10 @@ public class MainWindow extends JFrame implements ActionListener, Runnable, KeyL
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyLocation() == KeyEvent.KEY_LOCATION_NUMPAD && gameActive) {
+            if (gameData.getCharacterData().getDead()) {
+                gameOver();
+                return;
+            }
             DungeonFloor floor = gameData.getMapData().getDungeonFloor(gameData.getCharacterData().getCurrentFloor());
             Tile tile = floor.getTileFromMap(gameData.getCharacterData().getPositionX(), gameData.getCharacterData().getPositionY());
             switch (e.getKeyChar()) {

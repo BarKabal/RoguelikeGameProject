@@ -9,7 +9,7 @@ import map.items.Shield;
 import map.items.Sword;
 
 public class ItemGenerator { //future more complex item generation goes here
-    private GameData gameData;
+    private final GameData gameData;
 
     public ItemGenerator(GameData gameData) {
         this.gameData = gameData;

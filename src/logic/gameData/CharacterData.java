@@ -26,6 +26,7 @@ public class CharacterData { //przechowuje dane postaci
     private double accuracy;
     private final Random rng;
     private double dodge;
+    private boolean dead;
 
     public CharacterData(Random rng) {
         STR = 10;
@@ -48,6 +49,7 @@ public class CharacterData { //przechowuje dane postaci
     private void calculateDodge() {
         dodge = (LUC+DEX)/200;
     }
+
     private void calculateMaxHP() {
         maxHP = CON * 10;
     }
@@ -58,6 +60,9 @@ public class CharacterData { //przechowuje dane postaci
 
     public void takeDamage(double damage) {
         HP -= damage;
+        if (HP <= 0) {
+            dead = true;
+        }
     }
 
     public void moveCharacter(int changeX, int changeY, GameData gameData) {
@@ -173,7 +178,6 @@ public class CharacterData { //przechowuje dane postaci
 
     public void equipItem(int index) {
         item item = inventory.get(index);
-        System.out.println(item.getClass().toString());
         switch (item.getClass().toString()) {
             case "class map.items.Shield" -> {
                 item shieldOld = shield;
@@ -243,5 +247,9 @@ public class CharacterData { //przechowuje dane postaci
         calculateMaxHP();
         calculateAccuracy();
         HP = maxHP;
+    }
+
+    public boolean getDead() {
+        return dead;
     }
 }

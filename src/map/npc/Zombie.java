@@ -1,6 +1,5 @@
 package map.npc;
 
-
 public class Zombie extends Monster {
 
     public Zombie(int xPos, int yPos) {
@@ -10,7 +9,7 @@ public class Zombie extends Monster {
         currentHealth = maxHealth;
         lvl = 2;
         drop = null;
-        speed = 1.5;
+        speed = 1.509;
         minDmg = 4;
         maxDmg = 6;
     }

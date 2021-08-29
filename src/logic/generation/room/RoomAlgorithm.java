@@ -6,22 +6,21 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 public class RoomAlgorithm {
-    public double minHeight = 4;
-    public double maxHeight = 10;
-    public double minWidth = 4;
-    public double maxWidth = 10;
-    public double clusterCircleRadius = 20;
-    public ArrayList<Room> rooms;
-    public ArrayList<Room> mainRooms;
-    public ArrayList<Point2D.Double> mainRoomCenters;
-    public ArrayList<Integer[]> graphConnections;
-    public ArrayList<Room> finalRooms;
-    public double extraConnectChance = 0.005;
-    public int roomNumber = 250; //1000 max inaczej bardzo długa kompilacja
-    public GameData gameData;
-    public boolean changes = true;
-    public int xSize;
-    public int ySize;
+    private double minHeight = 4;
+    private double maxHeight = 10;
+    private double minWidth = 4;
+    private double maxWidth = 10;
+    private double clusterCircleRadius = 20;
+    private ArrayList<Room> rooms;
+    private ArrayList<Room> mainRooms;
+    private ArrayList<Point2D.Double> mainRoomCenters;
+    private ArrayList<Integer[]> graphConnections;
+    private ArrayList<Room> finalRooms;
+    private double extraConnectChance = 0.005;
+    private int roomNumber = 250; //1000 max inaczej bardzo długa kompilacja
+    private GameData gameData;
+    private int xSize;
+    private int ySize;
     int[][] map;
 
     public RoomAlgorithm(GameData gameData) {
