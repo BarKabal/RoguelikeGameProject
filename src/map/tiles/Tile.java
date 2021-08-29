@@ -1,51 +1,63 @@
 package map.tiles;
 
-public class Tile {
-    protected int x, y;
-    private boolean wall, occupiedMon, occupiedIte, visible, transparent;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+
+public abstract class Tile {
+    protected int x, y, stairID;
+    private boolean wall, occupiedMon, occupiedIte, visible, transparent, seen;
     protected String asci;
+    protected int isStairs; //-1 for down, 0 for not stairs, 1 for up
 
     public void setWall(boolean wall) {
         this.wall = wall;
-    }
-
-    public void setOccupiedIte(boolean occupiedIte) {
-        this.occupiedIte = occupiedIte;
-    }
-
-    public void setOccupiedMon(boolean occupiedMon) {
-        this.occupiedMon = occupiedMon;
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    public void setTransparent(boolean transparent) {
-        this.transparent = transparent;
     }
 
     public boolean isWall() {
         return wall;
     }
 
-    public boolean isOccupiedMon() {
-        return occupiedMon;
+    public boolean markAsVisible() {
+        seen = true;
+        visible = true;
+        if (wall)
+            return true;
+        else
+            return false;
     }
 
-    public boolean isOccupiedIte() {
-        return occupiedIte;
+    public BufferedImage getPng() {
+        try {
+            String name = "src/graphics/tiles/" + this.getClass().getName().substring(10) + ".png";
+            return ImageIO.read(new File(name));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public boolean isVisible() {
+    public int isStairs() {
+        return isStairs;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void resetVisible() {
+        visible = false;
+    }
+
+    public boolean getVisible() {
         return visible;
     }
 
-    public boolean isTransparent() {
-        return transparent;
-    }
-
-    public String getAsci() {
-        return asci;
+    public boolean getSeen() {
+        return seen;
     }
 }

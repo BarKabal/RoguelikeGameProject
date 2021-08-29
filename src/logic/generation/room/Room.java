@@ -1,10 +1,10 @@
 package logic.generation.room;
 
 public class Room {
-    public static int number = 0;
-    public int id;
-    public double height, width, xPos, yPos, size;
-    public Vector vector;
+    private static int number = 0;
+    private int id;
+    private double height, width, xPos, yPos, size;
+    private Vector vector;
 
     public Room(double height, double width, double xPos, double yPos) {
         this.id = number;
@@ -15,6 +15,14 @@ public class Room {
         this.size = Math.abs(xPos * yPos);
         this.vector = new Vector(0, 0);
         number++;
+    }
+
+    public static int getNumber() {
+        return number;
+    }
+
+    public static void resetNumber() {
+        number = 0;
     }
 
     public void changeXPos(double xPos) {

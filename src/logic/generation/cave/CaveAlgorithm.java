@@ -1,9 +1,11 @@
 package logic.generation.cave;
 
+import logic.gameData.GameData;
+
 import java.util.Random;
 
 public class CaveAlgorithm {
-    Random rng;
+    GameData gameData;
     int xSize = 100;
     int ySize = 100;
     double chance = 0.45;
@@ -12,8 +14,8 @@ public class CaveAlgorithm {
     boolean changes = true;
     int[][] cave;
 
-    public CaveAlgorithm(long seed){
-        rng = new Random(seed);
+    public CaveAlgorithm(GameData gameData){
+        this.gameData = gameData;
     }
 
     public int[][] generateCave() {
@@ -31,7 +33,7 @@ public class CaveAlgorithm {
             findFill(cave, 0, 2);
         }
         finishConverting(cave);
-
+        printMapToTerminal(cave);
         return cave;
     }
 
@@ -41,7 +43,7 @@ public class CaveAlgorithm {
                 if (i == 0 || j == 0 || i == xSize - 1 || j == ySize - 1) {
                     cave[i][j] = 1;
                 } else {
-                    if (rng.nextDouble() < chance) {
+                    if (gameData.getRng().nextDouble() < chance) {
                         cave[i][j] = 1;
                     } else {
                         cave[i][j] = 0;
@@ -52,7 +54,7 @@ public class CaveAlgorithm {
         return cave;
     }
 
-    private int[][] reiterate(int[][] cave, boolean lastIter) {
+    private void reiterate(int[][] cave, boolean lastIter) {
         Random check = new Random(seed);
         int[][] neighbour = new int[xSize][ySize];
         for (int i = 1; i < xSize-1; i++) {
@@ -77,7 +79,6 @@ public class CaveAlgorithm {
                 }
             }
         }
-        return cave;
     }
 
     private int[][] findFill(int[][] cave, int colorStart, int colorEnd) {
@@ -294,5 +295,18 @@ public class CaveAlgorithm {
 
     public int[][] returnCave() {
         return cave;
+    }
+
+    private void printMapToTerminal(int[][] map) {
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                if (map[i][j] == 1) {
+                    System.out.print("#");
+                } else if (map[i][j] == 0) {
+                    System.out.print(".");
+                }
+            }
+            System.out.print("\n");
+        }
     }
 }

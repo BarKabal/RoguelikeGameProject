@@ -6,6 +6,5 @@ public class Entrance extends Tile {
         y = givenY;
         asci = "A";
         setWall(false);
-        setTransparent(true);
     }
 }

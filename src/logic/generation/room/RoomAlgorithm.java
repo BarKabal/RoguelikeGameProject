@@ -1,8 +1,9 @@
 package logic.generation.room;
 
+import logic.gameData.GameData;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class RoomAlgorithm {
     public double minHeight = 4;
@@ -16,15 +17,16 @@ public class RoomAlgorithm {
     public ArrayList<Integer[]> graphConnections;
     public ArrayList<Room> finalRooms;
     public double extraConnectChance = 0.005;
-    public int roomNumber = 300; //1000 max inaczej bardzo długa kompilacja
-    public Random rng;
+    public int roomNumber = 250; //1000 max inaczej bardzo długa kompilacja
+    public GameData gameData;
     public boolean changes = true;
     public int xSize;
     public int ySize;
     int[][] map;
 
-    public RoomAlgorithm(long seed) {
-        rng = new Random(seed);
+    public RoomAlgorithm(GameData gameData) {
+        Room.resetNumber();
+        this.gameData = gameData;
         rooms = new ArrayList<>();
         mainRooms = new ArrayList<>();
         mainRoomCenters = new ArrayList<>();
@@ -51,8 +53,8 @@ public class RoomAlgorithm {
     }
 
     private double[] generatePointInCircle() {
-        double t = 2 * Math.PI * rng.nextDouble();
-        double u = rng.nextDouble() + rng.nextDouble();
+        double t = 2 * Math.PI * gameData.getRng().nextDouble();
+        double u = gameData.getRng().nextDouble() + gameData.getRng().nextDouble();
         double r;
         if (u > 1) {
             r = 2 - u;
@@ -68,8 +70,8 @@ public class RoomAlgorithm {
 
     private Room constructRoomAroundPoint(double x, double y) {
         double width, height;
-        width = minWidth + (maxWidth - minWidth) * rng.nextDouble();
-        height = minHeight + (maxHeight - minHeight) * rng.nextDouble();
+        width = minWidth + (maxWidth - minWidth) * gameData.getRng().nextDouble();
+        height = minHeight + (maxHeight - minHeight) * gameData.getRng().nextDouble();
         return new Room(height, width, x + width / 2, y + height / 2);
     }
 
@@ -261,7 +263,7 @@ public class RoomAlgorithm {
             for (int j = 0; j < mainRooms.size(); j++) {
                 for (int k = 0; k < graphConnections.size(); k++) {
                     if (graphConnections.get(k)[0] != i || graphConnections.get(k)[1] != j && graphConnections.get(k)[0] != j || graphConnections.get(k)[1] != i) {
-                        if (rng.nextDouble() < extraConnectChance) {
+                        if (gameData.getRng().nextDouble() < extraConnectChance) {
                             Integer[] connection = new Integer[2];
                             connection[0] = mainRooms.get(i).getId();
                             connection[1] = mainRooms.get(j).getId();
@@ -298,8 +300,6 @@ public class RoomAlgorithm {
             addRoomToMap(map, finalRooms.get(i));
         }
         createDoorsAndHallways(map);
-        finishConverting(map);
-        printMapToTerminal(map);
     }
 
     private void addRoomToMap(int[][] map, Room room) {
@@ -320,7 +320,7 @@ public class RoomAlgorithm {
             for (int j = 0; j < map[0].length; j++) {
                 if (map[i][j] == 1) {
                     System.out.print("#");
-                } else if (map[i][j] == 0) {
+                } else /*if (map[i][j] == 0)*/ {
                     System.out.print(".");
                 }
             }
@@ -346,15 +346,42 @@ public class RoomAlgorithm {
             carveTunnel(scanRight(finalRooms.get(i), map), map);
             carveTunnel(scanDown(finalRooms.get(i), map), map);
         }
-        int colorEnd = -1;
+        int colorEnd = 10;
         while (true) {
             int[] res = findRoom(map);
             if (res == null) {
                 break;
             }
             floodFill(map, res[0], res[1], colorEnd);
-            colorEnd = 1;
+            colorEnd++;
         }
+        ArrayList<Integer> counter = new ArrayList<>();
+
+        int maxNum = 0, maxInd = 0;
+        for (int i = 0; i < xSize; i++) {
+            for (int j = 0; j < ySize; j++) {
+                if (map[i][j] >= 10) {
+                    if (counter.size() <= map[i][j]-10)
+                        counter.add(map[i][j] - 10, 1);
+                    else
+                        counter.add(map[i][j] - 10, counter.remove(map[i][j] - 10)+1);
+                }
+            }
+        }
+        for (int i = 0; i < counter.size(); i++) {
+            if (counter.get(i) > maxNum) {
+                maxInd = i;
+                maxNum = counter.get(i);
+            }
+        }
+        for (int i = 0; i < xSize; i++) {
+            for (int j = 0; j < ySize; j++) {
+                if (map[i][j] != maxInd+10 && map[i][j] != 1) {
+                    map[i][j] = 1;
+                }
+            }
+        }
+        printMapToTerminal(map);
     }
 
     private Integer[] scanRight(Room room, int[][] map) {
@@ -368,8 +395,8 @@ public class RoomAlgorithm {
             int currLen = 0;
             for (int j = right; j < map[0].length; j++) {
                 if (map[i][j] == 0) {
-                    if (j - right +1 < minLen) {
-                        minLen = j - right +1;
+                    if (j - right + 1 < minLen) {
+                        minLen = j - right + 1;
                         rows.clear();
                     }
                     zeroFound = true;
@@ -384,10 +411,10 @@ public class RoomAlgorithm {
                 rows.add(new Integer[]{i, right, minLen, 0});
             }
         }
-        if (rows.size() == 0 || minLen > 12) {
+        if (rows.size() == 0 || minLen > 15) {
             return null;
         } else {
-            return rows.get(rng.nextInt(rows.size()));
+            return rows.get(gameData.getRng().nextInt(rows.size()));
         }
     }
 
@@ -402,8 +429,8 @@ public class RoomAlgorithm {
             int currLen = 0;
             for (int j = down; j < map.length; j++) {
                 if (map[j][i] == 0) {
-                    if (j - down +1 < minLen) {
-                        minLen = j - down+1;
+                    if (j - down + 1 < minLen) {
+                        minLen = j - down + 1;
                         cols.clear();
                     }
                     zeroFound = true;
@@ -421,7 +448,7 @@ public class RoomAlgorithm {
         if (cols.size() == 0 || minLen > 12) {
             return null;
         } else {
-            return cols.get(rng.nextInt(cols.size()));
+            return cols.get(gameData.getRng().nextInt(cols.size()));
         }
     }
 
@@ -430,12 +457,12 @@ public class RoomAlgorithm {
             return;
         }
         if (tunnelData[3] == 0) {
-            for (int i = 0; i < tunnelData[2]-1; i++) {
-                map[tunnelData[0]][tunnelData[1] + i] = 3;
+            for (int i = 0; i < tunnelData[2] - 1; i++) {
+                map[tunnelData[0]][tunnelData[1] + i] = 0;
             }
         } else {
-            for (int i = 0; i < tunnelData[2]-1; i++) {
-                map[tunnelData[0] + i][tunnelData[1]] = 3;
+            for (int i = 0; i < tunnelData[2] - 1; i++) {
+                map[tunnelData[0] + i][tunnelData[1]] = 0;
             }
         }
     }
@@ -443,7 +470,7 @@ public class RoomAlgorithm {
     private int[] findRoom(int[][] map) { //returns upper left corner
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
-                if (map[i][j] == 0) {
+                if (map[i][j] < 10 && map[i][j] != 1 && map[i][j] != 4) {
                     return new int[]{i, j};
                 }
             }
@@ -473,22 +500,8 @@ public class RoomAlgorithm {
         return cave;
     }
 
-    private void finishConverting(int[][] map) {
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[0].length; j++) {
-                switch (map[i][j]) {
-                    case -1:
-                    case 3:
-                    case 4:
-                        map[i][j] = 0; break;
-                    case 0: map[i][j] = 1; break;
-                }
-            }
-        }
-    }
-
     public int[] returnSize() {
-        return new int[]{map.length,map[0].length};
+        return new int[]{map.length, map[0].length};
     }
 
     public int[][] returnMap() {

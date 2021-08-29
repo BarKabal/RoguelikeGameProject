@@ -7,7 +7,6 @@ public class Wall extends Tile {
         y = givenY;
         asci = "#";
         setWall(true);
-        setTransparent(false);
     }
 
 }
